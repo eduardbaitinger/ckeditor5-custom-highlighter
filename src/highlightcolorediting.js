@@ -50,7 +50,10 @@ export default class HighlightColorEditing extends Plugin {
         editor.conversion.for('upcast')
             .add(upcastElementToAttribute({
                 view: {
-                    name: 'mark'
+                    name: 'span',
+                    styles: {
+                        'background-color': /[\s\S]+/
+                    },
                 },
                 model: {
                     key: TEXT_COLOR,
@@ -62,11 +65,19 @@ export default class HighlightColorEditing extends Plugin {
                         }
 
                         // determine closest color
-                        let rgb = rgbFromColor(color);
-                        if (!rgb) {
-                            return null;
+                        let hexColor;
+                        if(color.startsWith('#')) {
+                            hexColor = color;
+                        } else {
+                            let rgb = rgbFromColor(color);
+                            if (!rgb) {
+                                return null;
+                            }
+
+                            hexColor = toHex(rgb[1], rgb[2], rgb[3]);
                         }
-                        let best = options.closestRGB(toHex(rgb[1], rgb[2], rgb[3]));
+
+                        let best = options.closestRGB(hexColor);
 
                         if (!best) {
                             return null;
